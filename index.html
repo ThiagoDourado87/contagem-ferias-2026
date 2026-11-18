@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUEST: Férias 2026 | Countdown</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Orbitron (Gamer/Sci-Fi), Plus Jakarta Sans (UI limpa) e JetBrains Mono (Números fixos) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Configuração Customizada do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        gamer: ['"Orbitron"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        bgDark: '#070913',
+                        cardDark: 'rgba(15, 20, 38, 0.75)',
+                        neonCyan: '#00f3ff',
+                        neonPurple: '#b829ea',
+                        neonGold: '#ffd700',
+                        xmasRed: '#ff2a5f',
+                        xmasGreen: '#00e676'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 10px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.1)' },
+                            '100%': { boxShadow: '0 0 25px rgba(184, 41, 234, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos Base e Efeitos Visuais */
+        body {
+            background-color: #070913;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(184, 41, 234, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(0, 243, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.04) 0%, transparent 60%);
+            color: #f8fafc;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Grade cibernética sutil no fundo */
+        .cyber-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+        }
+
+        /* Vidro fosco estilo HUD Otaku/Gamer */
+        .hud-card {
+            background: rgba(13, 18, 34, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Cantos estilo mira/HUD */
+        .hud-corner {
+            position: relative;
+        }
+        .hud-corner::before, .hud-corner::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: #00f3ff;
+            border-style: solid;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .hud-corner::before {
+            top: -1px;
+            left: -1px;
+            border-width: 2px 0 0 2px;
+            border-top-left-radius: 0.75rem;
+        }
+        .hud-corner::after {
+            bottom: -1px;
+            right: -1px;
+            border-width: 0 2px 2px 0;
+            border-bottom-right-radius: 0.75rem;
+        }
+
+        /* Brilho de texto */
+        .text-glow-cyan {
+            text-shadow: 0 0 18px rgba(0, 243, 255, 0.55);
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 18px rgba(255, 215, 0, 0.55);
+        }
+
+        /* Barra de XP animada */
+        .xp-bar-fill {
+            background: linear-gradient(90deg, #b829ea 0%, #00f3ff 65%, #ffd700 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Canvas de neve */
+        #snowCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="cyber-grid flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 relative selection:bg-neonCyan selection:text-bgDark">
+
+    <!-- Canvas para Neve Digital / Partículas Natalinas -->
+    <canvas id="snowCanvas"></canvas>
+
+    <!-- Conteúdo Principal -->
+    <main class="relative z-10 w-full max-w-4xl mx-auto flex flex-col gap-6">
+        
+        <!-- Cabeçalho / Status da Quest -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+            <div class="flex items-center gap-3">
+                <!-- Ícone SVG Controle Gamer com Gorro de Natal Minimalista -->
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-neonPurple/30 to-neonCyan/20 border border-neonCyan/40 flex items-center justify-center shadow-lg animate-float">
+                    <svg class="w-6 h-6 text-neonCyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- Controle -->
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h4m-2-2v4m7-3h.01M17 13h.01M5 8h14a3 3 0 012.96 3.47l-.8 5A3 3 0 0118.2 19h-1.4a2 2 0 01-1.6-.8l-1.2-1.6a2 2 0 00-1.6-.8h-.8a2 2 0 00-1.6.8l-1.2 1.6a2 2 0 01-1.6.8H5.8a3 3 0 01-2.96-2.53l-.8-5A3 3 0 015 8z"/>
+                        <!-- Detalhe Estrela/Floco Natalino -->
+                        <path stroke="#ffd700" stroke-linecap="round" d="M12 2v3m-1.5-1.5h3"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 text-[11px] font-gamer tracking-wider uppercase rounded bg-xmasRed/20 text-xmasRed border border-xmasRed/40 font-bold">
+                            🎄 Evento de Fim de Ano
+                        </span>
+                        <span class="text-xs font-mono text-slate-400 hidden sm:inline">SERVER: BRT (UTC-3)</span>
+                    </div>
+                    <h1 class="font-gamer text-xl sm:text-2xl md:text-3xl font-black tracking-wide text-white mt-0.5">
+                        QUEST: <span class="text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-white to-neonGold">MODO FÉRIAS</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Badge da Data Alvo -->
+            <div class="hud-card px-4 py-2 rounded-xl flex items-center gap-2.5 border-neonGold/30">
+                <span class="w-2 h-2 rounded-full bg-neonGold animate-ping"></span>
+                <div class="text-xs sm:text-sm font-mono">
+                    <span class="text-slate-400">ALVO:</span>
+                    <span class="text-neonGold font-bold">18/12/2026 • 17:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TELA ATIVA: Contagem Regressiva -->
+        <div id="countdownContainer" class="flex flex-col gap-6 transition-all duration-500">
+            
+            <!-- Bloco 1: TOTAL GERAL (Horas, Minutos, Segundos) - Destaque Principal -->
+            <section class="hud-card hud-corner rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden">
+                <!-- Brilho decorativo de fundo -->
+                <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-neonCyan/10 blur-3xl pointer-events-none"></div>
+
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/30 text-neonCyan text-xs font-gamer tracking-widest uppercase mb-4">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+                    Tempo Total Restante
+                </div>
+
+                <!-- Placar Gigante em Horas Totais, Minutos e Segundos -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl mx-auto my-2">
+                    <!-- Total de Horas -->
+                    <div class="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3 sm:p-5 flex flex-col items-center justify-center">
+                        <span id="totalHours" class="font-mono text-3xl sm:text-5xl md:text-6xl font-extrabold text-neonCyan text-glow-cyan tracking-tight">
+                            000
+                        </span>
+                        <span class="font-gamer text-[10px] sm:text-xs tracking-widest uppercase text-slate-400 mt-2">
+                            Horas Totais
+                        </span>
+                    </div>
+
+                    <!-- Minutos -->
+                    <div class="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3 sm:p-5 flex flex-col items-center justify-center">
+                        <span id="totalMinutes" class="font-mono text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight">
+                            00
+                        </span>
+                        <span class="font-gamer text-[10px] sm:text-xs tracking-widest uppercase text-slate-400 mt-2">
+                            Minutos
+                        </span>
+                    </div>
+
+                    <!-- Segundos -->
+                    <div class="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3 sm:p-5 flex flex-col items-center justify-center relative overflow-hidden">
+                        <span id="totalSeconds" class="font-mono text-3xl sm:text-5xl md:text-6xl font-extrabold text-neonGold text-glow-gold tracking-tight">
+                            00
+                        </span>
+                        <span class="font-gamer text-[10px] sm:text-xs tracking-widest uppercase text-slate-400 mt-2">
+                            Segundos
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Frase Legível por Extenso -->
+                <p id="readableTotal" class="mt-5 text-sm sm:text-base text-slate-300 font-medium">
+                    Calculando coordenadas temporais...
+                </p>
+            </section>
+
+            <!-- Bloco 2: Detalhamento Tradicional (Dias, Horas, Minutos, Segundos) -->
+            <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div class="hud-card rounded-xl p-4 flex flex-col items-center justify-center border-t-2 border-t-neonPurple/70">
+                    <span id="tradDays" class="font-mono text-2xl sm:text-3xl font-bold text-white">00</span>
+                    <span class="text-[11px] font-gamer uppercase tracking-wider text-neonPurple mt-1">Dias</span>
+                </div>
+                <div class="hud-card rounded-xl p-4 flex flex-col items-center justify-center border-t-2 border-t-neonCyan/70">
+                    <span id="tradHours" class="font-mono text-2xl sm:text-3xl font-bold text-white">00</span>
+                    <span class="text-[11px] font-gamer uppercase tracking-wider text-neonCyan mt-1">Horas</span>
+                </div>
+                <div class="hud-card rounded-xl p-4 flex flex-col items-center justify-center border-t-2 border-t-xmasGreen/70">
+                    <span id="tradMinutes" class="font-mono text-2xl sm:text-3xl font-bold text-white">00</span>
+                    <span class="text-[11px] font-gamer uppercase tracking-wider text-xmasGreen mt-1">Minutos</span>
+                </div>
+                <div class="hud-card rounded-xl p-4 flex flex-col items-center justify-center border-t-2 border-t-neonGold/70">
+                    <span id="tradSeconds" class="font-mono text-2xl sm:text-3xl font-bold text-white">00</span>
+                    <span class="text-[11px] font-gamer uppercase tracking-wider text-neonGold mt-1">Segundos</span>
+                </div>
+            </section>
+
+            <!-- Bloco 3: Barra de Progresso RPG / XP & Status Dinâmico -->
+            <section class="hud-card rounded-2xl p-5 sm:p-6 flex flex-col gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded bg-neonPurple/20 border border-neonPurple/50 text-neonPurple font-gamer text-xs font-bold">
+                            XP BAR
+                        </span>
+                        <span id="questRank" class="text-xs sm:text-sm font-semibold text-slate-200">
+                            Arco Final: Sobrevivendo ao Expediente
+                        </span>
+                    </div>
+                    <span id="xpPercentage" class="font-mono text-sm sm:text-base font-bold text-neonCyan">
+                        0.0000%
+                    </span>
+                </div>
+
+                <!-- Barra de Progresso -->
+                <div class="w-full h-4 bg-slate-950/90 rounded-full p-0.5 border border-slate-700/80 overflow-hidden relative">
+                    <div id="xpFill" class="h-full rounded-full xp-bar-fill transition-all duration-300" style="width: 0%;"></div>
+                </div>
+
+                <!-- Mensagem Dinâmica Estilo Anime/Gamer/Natal -->
+                <div class="flex items-start sm:items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-xl p-3.5">
+                    <span id="statusEmoji" class="text-2xl select-none">⚔️</span>
+                    <div class="flex-1">
+                        <p id="dynamicMessage" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Carregando status da missão...
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TELA DE COMEMORAÇÃO (Oculta até zerar) -->
+        <section id="celebrationContainer" class="hidden hud-card hud-corner rounded-2xl p-8 sm:p-12 text-center flex-col items-center justify-center gap-5 border-neonGold/60 animate-glow">
+            <div class="text-5xl sm:text-6xl animate-bounce">🎅🎮🏆</div>
+            <div class="inline-block px-4 py-1 rounded-full bg-xmasGreen/20 border border-xmasGreen/50 text-xmasGreen font-gamer text-xs sm:text-sm tracking-widest uppercase font-bold">
+                LEVEL UP! MISSÃO CUMPRIDA
+            </div>
+            <h2 class="font-gamer text-2xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neonGold via-white to-neonCyan leading-tight">
+                QUEST CONCLUÍDA:<br>MODO FÉRIAS ATIVADO!
+            </h2>
+            <p class="text-slate-300 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                O expediente acabou! Hora de equipar o gorro de Natal, abrir os jogos acumulados na biblioteca, maratonar animes e aproveitar o descanso merecido! 🎄✨
+            </p>
+            <div class="mt-2 flex flex-wrap justify-center gap-3 text-xs font-mono text-neonGold">
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-neonGold/30">+9999 XP DESCANSO</span>
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-neonCyan/30">BUFF: ESPÍRITO NATALINO</span>
+                <span class="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-neonPurple/30">STATUS: OFF-LINE DO TRABALHO</span>
+            </div>
+        </section>
+
+        <!-- Rodapé Minimalista com Ação Rápida -->
+        <footer class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 px-2 pb-4">
+            <p class="font-mono">
+                SYSTEM.CLOCK // <span class="text-slate-400">FÉRIAS_2026_V1.0</span>
+            </p>
+            <button id="copyStatusBtn" class="px-3.5 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-neonCyan border border-slate-700 transition flex items-center gap-2 font-medium cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span id="copyBtnText">Copiar tempo restante</span>
+            </button>
+        </footer>
+    </main>
+
+    <script>
+        /**
+         * CONFIGURAÇÃO DA DATA ALVO E INÍCIO DA JORNADA
+         * Data Alvo: 18 de Dezembro de 2026 às 17:00:00 (Horário de Brasília -03:00)
+         */
+        const TARGET_DATE = new Date('2026-12-18T17:00:00-03:00').getTime();
+        
+        // Marco inicial para cálculo da barra de XP (Ex: 30 dias antes das férias)
+        // Se o usuário acessar antes disso, ajusta dinamicamente para não ficar negativo
+        const DEFAULT_START_DATE = new Date('2026-11-18T14:00:00-03:00').getTime();
+        const START_DATE = Math.min(DEFAULT_START_DATE, Date.now() - 1000);
+
+        // Referências do DOM
+        const elTotalHours = document.getElementById('totalHours');
+        const elTotalMinutes = document.getElementById('totalMinutes');
+        const elTotalSeconds = document.getElementById('totalSeconds');
+        const elReadableTotal = document.getElementById('readableTotal');
+
+        const elTradDays = document.getElementById('tradDays');
+        const elTradHours = document.getElementById('tradHours');
+        const elTradMinutes = document.getElementById('tradMinutes');
+        const elTradSeconds = document.getElementById('tradSeconds');
+
+        const elXpFill = document.getElementById('xpFill');
+        const elXpPercentage = document.getElementById('xpPercentage');
+        const elQuestRank = document.getElementById('questRank');
+        const elDynamicMessage = document.getElementById('dynamicMessage');
+        const elStatusEmoji = document.getElementById('statusEmoji');
+
+        const countdownContainer = document.getElementById('countdownContainer');
+        const celebrationContainer = document.getElementById('celebrationContainer');
+
+        let currentSummaryText = '';
+        let isCompleted = false;
+
+        /**
+         * Formata números com zero à esquerda (ex: 9 -> "09")
+         */
+        function padZero(num, size = 2) {
+            return String(num).padStart(size, '0');
+        }
+
+        /**
+         * Retorna mensagens temáticas Gamer/Otaku/Natal conforme as horas restantes
+         */
+        function getThematicStatus(totalHoursLeft) {
+            if (totalHoursLeft > 500) {
+                return {
+                    emoji: '🗺️',
+                    rank: 'RANK C • Preparando o Inventário',
+                    msg: 'A jornada até o Natal já começou! Mantenha o foco nas quests diárias e farmando XP no trabalho.'
+                };
+            } else if (totalHoursLeft > 240) {
+                return {
+                    emoji: '⚔️',
+                    rank: 'RANK B • Arco de Treinamento',
+                    msg: 'Faltam menos de 3 semanas! Já dá para ir escolhendo quais jogos zerar e quais animes maratonar nas férias.'
+                };
+            } else if (totalHoursLeft > 72) {
+                return {
+                    emoji: '🎄',
+                    rank: 'RANK A • Reta Final Natalina',
+                    msg: 'Os sinos de Natal já estão tocando ao longe! A barra de mana está carregando para o descanso épico.'
+                };
+            } else if (totalHoursLeft > 24) {
+                return {
+                    emoji: '🔥',
+                    rank: 'RANK S • Batalha Contra o Último Boss',
+                    msg: 'Menos de 72 horas! O chefe final da semana está com pouco HP. Use suas últimas poções de café!'
+                };
+            } else if (totalHoursLeft > 5) {
+                return {
+                    emoji: '⚡',
+                    rank: 'RANK SS • Último Dia de Expediente!',
+                    msg: 'É HOJE! Faltam pouquíssimas horas para você fechar todas as abas e ativar o Modo Férias!'
+                };
+            } else {
+                return {
+                    emoji: '🎅',
+                    rank: 'RANK SSS • Contagem Regressiva Final!',
+                    msg: 'Prepare o alt+F4 da liberdade! Os últimos minutos antes da glória natalina e gamer!'
+                };
+            }
+        }
+
+        /**
+         * Atualiza o cronômetro em tempo real
+         */
+        function updateCountdown() {
+            const now = Date.now();
+            const distance = TARGET_DATE - now;
+
+            // Verifica se chegou a zero
+            if (distance <= 0) {
+                if (!isCompleted) {
+                    isCompleted = true;
+                    countdownContainer.classList.add('hidden');
+                    celebrationContainer.classList.remove('hidden');
+                    celebrationContainer.classList.add('flex');
+                    currentSummaryText = '🎄🎮 QUEST CONCLUÍDA: MODO FÉRIAS ATIVADO!';
+                    boostSnowCelebration();
+                }
+                return;
+            }
+
+            // 1. Cálculo Total Geral (Horas totais, minutos restantes, segundos restantes)
+            const totalHours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // 2. Cálculo Tradicional (Dias, Horas do dia, Minutos, Segundos)
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hoursOfDay = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+            // Atualiza DOM - Total Geral
+            elTotalHours.textContent = padZero(totalHours, totalHours >= 100 ? 3 : 2);
+            elTotalMinutes.textContent = padZero(minutes);
+            elTotalSeconds.textContent = padZero(seconds);
+
+            const hLabel = totalHours === 1 ? 'hora' : 'horas';
+            const mLabel = minutes === 1 ? 'minuto' : 'minutos';
+            const sLabel = seconds === 1 ? 'segundo' : 'segundos';
+
+            elReadableTotal.innerHTML = `Faltam exatamente <strong class="text-neonCyan">${totalHours} ${hLabel}</strong>, <strong class="text-white">${minutes} ${mLabel}</strong> e <strong class="text-neonGold">${seconds} ${sLabel}</strong> para as férias!`;
+
+            currentSummaryText = `🎄🎮 Faltam ${totalHours} ${hLabel}, ${minutes} ${mLabel} e ${seconds} ${sLabel} (${days}d ${hoursOfDay}h) para as minhas férias!`;
+
+            // Atualiza DOM - Tradicional
+            elTradDays.textContent = padZero(days);
+            elTradHours.textContent = padZero(hoursOfDay);
+            elTradMinutes.textContent = padZero(minutes);
+            elTradSeconds.textContent = padZero(seconds);
+
+            // 3. Cálculo da Barra de Progresso XP
+            const totalJourney = TARGET_DATE - START_DATE;
+            const elapsedJourney = now - START_DATE;
+            let progress = (elapsedJourney / totalJourney) * 100;
+            progress = Math.max(0, Math.min(100, progress));
+
+            elXpFill.style.width = `${progress.toFixed(2)}%`;
+            elXpPercentage.textContent = `${progress.toFixed(4)}%`;
+
+            // 4. Atualiza Mensagem Dinâmica
+            const status = getThematicStatus(totalHours);
+            elStatusEmoji.textContent = status.emoji;
+            elQuestRank.textContent = status.rank;
+            elDynamicMessage.textContent = status.msg;
+        }
+
+        /**
+         * Botão de Copiar Status (usando execCommand para compatibilidade universal)
+         */
+        const copyBtn = document.getElementById('copyStatusBtn');
+        const copyBtnText = document.getElementById('copyBtnText');
+
+        copyBtn.addEventListener('click', () => {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = currentSummaryText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                copyBtnText.textContent = 'Copiado para o clipboard! ✨';
+                copyBtn.classList.add('border-neonCyan', 'text-neonCyan');
+                setTimeout(() => {
+                    copyBtnText.textContent = 'Copiar tempo restante';
+                    copyBtn.classList.remove('border-neonCyan', 'text-neonCyan');
+                }, 2500);
+            } catch (err) {
+                console.error('Erro ao copiar texto:', err);
+            }
+            document.body.removeChild(tempInput);
+        });
+
+        /**
+         * SISTEMA DE NEVE DIGITAL / PARTÍCULAS NATALINAS EM CANVAS
+         */
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let particleCount = 65;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticles() {
+            particles = [];
+            const colors = [
+                'rgba(255, 255, 255, 0.65)', // Neve clássica
+                'rgba(0, 243, 255, 0.45)',   // Brilho Ciano Gamer
+                'rgba(255, 215, 0, 0.45)',   // Brilho Dourado Natal
+                'rgba(184, 41, 234, 0.35)'   // Brilho Roxo Otaku
+            ];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2.5 + 0.8,
+                    speedY: Math.random() * 1.1 + 0.3,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    isPixel: Math.random() > 0.65 // Mistura flocos redondos com "pixels" digitais
+                });
+            }
+        }
+
+        function boostSnowCelebration() {
+            particleCount = 150;
+            createParticles();
+            particles.forEach(p => {
+                p.speedY *= 1.8;
+                p.radius += 0.8;
+            });
+        }
+
+        function animateSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                ctx.fillStyle = p.color;
+
+                if (p.isPixel) {
+                    // Floco estilo pixel art
+                    ctx.fillRect(p.x, p.y, p.radius * 1.8, p.radius * 1.8);
+                } else {
+                    // Floco suave
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                p.y += p.speedY;
+                p.x += p.speedX + Math.sin(p.y * 0.01) * 0.25;
+
+                if (p.y > canvas.height) {
+                    p.y = -5;
+                    p.x = Math.random() * canvas.width;
+                }
+                if (p.x > canvas.width) p.x = 0;
+                if (p.x < 0) p.x = canvas.width;
+            }
+
+            requestAnimationFrame(animateSnow);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+
+        // Inicialização
+        window.onload = function() {
+            resizeCanvas();
+            createParticles();
+            animateSnow();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        };
+    </script>
+</body>
+</html>
